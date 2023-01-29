@@ -43,8 +43,14 @@ def data_callback(xbee_message):
                 device.send_data(remote_device, wd)    
         else:
             proc = subprocess.Popen(data, shell=True, stdout=subprocess.PIPE, cwd=wd)
-            tmp = proc.stdout.read()
-            device.send_data(remote_device, tmp)
+            #tmp = proc.stdout.readlines()
+            while True:
+                line = proc.stdout.readline()
+                if not line:
+                    break
+                device.send_data(remote_device, line.strip())
+            #print(tmp)
+            #for line in tmp:
     except TimeoutException:
         print("Process startup failed")
         device.send_data(remote_device, "Command failed")
