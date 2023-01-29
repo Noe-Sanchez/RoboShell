@@ -14,8 +14,8 @@ onHold = False
 
 def data_callback(xbee_message):
     print(xbee_message.data.decode())
-    global onHold
-    onHold = False
+    #global onHold
+    #onHold = False
 
 def main():
     global onHold
@@ -32,6 +32,7 @@ def main():
 
         print(" ...found", remote_id)
         device.add_data_received_callback(data_callback)
+        device.set_sync_ops_timeout(100)
 
         print("> RoboShell online")
 
@@ -46,7 +47,7 @@ def main():
                     print("> Closing RoboShell")
                     exit(1)
                 else:
-                    onHold = True
+                    #onHold = True
                     device.send_data(remote_device, outgoing_data)
 
     finally:
