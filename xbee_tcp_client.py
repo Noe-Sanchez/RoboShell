@@ -38,19 +38,25 @@ def data_callback(xbee_message):
             try:
                 data_list.pop(0)
                 wd = data_list[0]
-                device.send_data(remote_device, 'Chdir ok')    
+                device.send_data(remote_device, '\nChdir ok')    
             except IndexError:
                 device.send_data(remote_device, wd)    
-        else:
-            proc = subprocess.Popen(data, shell=True, stdout=subprocess.PIPE, cwd=wd)
-            #tmp = proc.stdout.readlines()
+        elif data_list[0] == 'ser':
+            print("ROS command")
+            data_list.pop(0)
+            ros_cmd = ' '.join(data_list)
+            proc = subprocess.Popen(ros_cmd, shell=True, stdout=subprocess.PIPE, cwd=wd)
             while True:
                 line = proc.stdout.readline()
                 if not line:
                     break
                 device.send_data(remote_device, line.strip())
-            #print(tmp)
-            #for line in tmp:
+        else:
+            print("Normal command")
+            proc = subprocess.Popen(data, shell=True, stdout=subprocess.PIPE, cwd=wd)
+            tmp = proc.stdout.read()
+            device.send_data(remote_device, tmp)
+
     except TimeoutException:
         print("Process startup failed")
         device.send_data(remote_device, "Command failed")
